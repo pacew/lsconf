@@ -48,6 +48,7 @@ function slurp_file (filename) {
 
     return ("");
 }
+exports.slurp_file = slurp_file;
 
 function read_json_file (filename) {
     var str = slurp_file (filename);
@@ -68,7 +69,8 @@ let pkgs = [
   "apache2",
   "emacs-nox",
   "nodejs",
-  "libapache2-mod-php"
+  "libapache2-mod-php",
+  "awscli"
 ];
 
 exports.ls_setup = function () {

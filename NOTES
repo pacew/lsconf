@@ -39,3 +39,17 @@ unlocking your ssh private key a couple of times, if prompmted
 
 reboot the server after the packages are installed. this also
 activates the port range
+
+================================================================
+
+to make a database
+
+create postgres db
+
+on RDS detail page:
+host is under endpoint
+username is under username
+password as supplied (in private file)
+initial db name is under "DB name"
+
+psql --host=main.czuqd0u2qqew.us-east-1.rds.amazonaws.com --username=master --password=M0lwLidF1w --dbname=maindb

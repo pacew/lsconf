@@ -1,0 +1,47 @@
+#! /usr/bin/env nodejs
+/* -*- mode:javascript -*- */
+
+var sprintf_js = require ('sprintf-js');
+var sprintf = sprintf_js.sprintf;
+var vsprintf = sprintf_js.vsprintf;
+function printf (fmt, ...args) { process.stdout.write (vsprintf (fmt, args)); }
+
+var argv = require('minimist')(process.argv.slice(2));
+
+let server = argv._[0];
+
+if (! server) {
+  printf ("usage: db-put server\n");
+  process.exit (1);
+}
+
+const fs = require ('fs');
+const pwcli = require ('./pwcli');
+
+let secrets_file = sprintf ("%s/private/secrets.js", process.env['HOME']);
+let secrets = null;
+try {
+  secrets = JSON.parse (pwcli.slurp_file (secrets_file));
+} catch (e) {
+}
+
+if (secrets == null || secrets == "") {
+  printf ("can't read ~/private/secrets.js\n");
+  process.exit (1);
+}
+
+let dbinfo = secrets['lightsail-db'];
+
+if (dbinfo == null) {
+  printf ("no dbinfo in secrets\n");
+  process.exit (1);
+}
+
+fs.writeFileSync ("TMP.dbinfo", JSON.stringify (dbinfo, null, 2) + "\n");
+
+let cmd = sprintf ("ssh %s 'sudo tee /etc/lsconf-dbinfo > /dev/null'" +
+		   " < TMP.dbinfo ", 
+		   server);
+printf ("%s\n", cmd);
+
+
