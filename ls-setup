@@ -1,0 +1,6 @@
+#! /usr/bin/env nodejs
+/* -*- mode:javascript -*- */
+
+const pwcli = require ('./pwcli');
+
+pwcli.ls_setup ();

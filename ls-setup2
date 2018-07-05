@@ -1,0 +1,58 @@
+#! /bin/sh
+
+. ./TMP.sh
+
+do_apt=0
+
+if [ "$1" = "apt" ]; then
+    do_apt=1
+fi
+
+if [ ! -x /usr/bin/emacs ]; then
+    do_apt=1
+fi
+
+if [ $do_apt = 1 ]; then
+    sudo apt-get update
+    sudo apt-get upgrade -y
+    sudo apt-get install -y $PKGS
+fi
+
+grep "^${MAIN_USER}:" /etc/passwd > /dev/null 2>&1
+if [ $? != 0 ]
+then
+    sudo adduser --disabled-password --gecos="$MAIN_FULLNAME" $MAIN_USER
+fi
+
+sudo adduser --quiet $MAIN_USER bitnami-admins
+
+H=/home/$MAIN_USER
+
+sshdir=$H/.ssh
+sudo mkdir -p $sshdir
+sudo chmod 700 $sshdir
+sudo cp id_rsa.pub $sshdir/authorized_keys2
+
+sudo cp TMP.gitconfig $H/.gitconfig
+
+grep bitnamirc $H/.bashrc > /dev/null 2>&1
+if [ $? != 0 ]; then
+    sudo sh -c "(echo; echo . /opt/bitnami/.bitnamirc) >> $H/.bashrc"
+fi
+
+sudo chown -R $MAIN_USER.$MAIN_USER $H
+
+sudo sh -c "echo ServerName $SERVERNAME > /etc/apache2/conf-enabled/name.conf"
+
+sudo sh -c "echo $SERVERNAME 8000 > /etc/apache2/NAT_INFO"
+
+sudo tar -C /etc/apache2 -xf - < TMP.wild.tar
+
+sudo a2enmod --quiet ssl rewrite headers
+
+sudo /etc/init.d/apache2 stop
+sleep 2
+sudo /etc/init.d/apache2 start
+
+echo ok
+

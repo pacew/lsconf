@@ -1,0 +1,41 @@
+To set up new lightsail server (which can host multiple websites):
+
+log into aws console
+Services ->  EC2 -> Lightsail
+
+Make static ip address:
+Networking -> create static ip
+choose virginia zone
+
+give it a name like l1.pacew.org-IP (you can't change it later, and it
+shouldn't be the exact domain name)
+
+go to the dns provider for the server name and set the static ip address
+
+Create Instance
+set zone to Virginia
+set platform to Linux/Unix
+set blueprint to Apps+OS Node.js
+launch script should be empty
+
+select your key under ssh key pair (if you haven't already, choose
+Create New and upload your main ssh public rsa key)
+
+choose the lowest priced tier
+
+give it the name for the underlying server (e.g. l1.pacew.org ) 
+(you can't change it later)
+
+create; wait about a minute for it to go to state running
+
+go to Lightspeed home, click on the instance, then Networking assign
+it the static ip
+
+on instance -> network, add port range 8000-9999 to list (22, 80, and
+443 will be automatically added when apcahe starts)
+
+run ./ls-setup SERVERNAME
+unlocking your ssh private key a couple of times, if prompmted
+
+reboot the server after the packages are installed. this also
+activates the port range
